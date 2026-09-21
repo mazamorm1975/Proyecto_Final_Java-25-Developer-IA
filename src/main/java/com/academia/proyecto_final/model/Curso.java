@@ -14,18 +14,16 @@ import lombok.NoArgsConstructor;
 public class Curso {
 
     @Id
-    @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Integer idCurso;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String nombre;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10)
     private String siglas;
 
     @Column(nullable = false)
     private Boolean estado;
-
-
 }
