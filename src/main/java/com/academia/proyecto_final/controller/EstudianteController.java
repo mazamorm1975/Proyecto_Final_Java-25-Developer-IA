@@ -1,18 +1,17 @@
 package com.academia.proyecto_final.controller;
 
-import com.academia.proyecto_final.exception.EstudianteNotFoundException;
+
+import com.academia.proyecto_final.dto.EstudianteDTO;
 import com.academia.proyecto_final.model.Estudiante;
 import com.academia.proyecto_final.service.IEstudianteService;
+import com.academia.proyecto_final.utils.UtilsHelperClass;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
+
 
 @RestController
 @RequestMapping("v1/estudiante")
@@ -21,27 +20,48 @@ public class EstudianteController {
 
     private final IEstudianteService estudianteService;
 
-    @GetMapping("/generalStudentList")
-    public ResponseEntity<List<Estudiante>> listadoGeneralEstudiantes(){
-        //Se obtiene un listado general de todos los estudiantes de la academia
-        Function<Estudiante, Integer> estudiante = x -> x.getEdad();
-        List<Estudiante> listadoEdadEstudiante = estudianteService.findAll()
-              .stream()
-              .sorted(Comparator.comparing(estudiante).reversed()).toList();
+    private final UtilsHelperClass mapper;
 
-      return new ResponseEntity<>(listadoEdadEstudiante, HttpStatus.OK);
+
+    @GetMapping("/generalStudentList")
+    public ResponseEntity<List<EstudianteDTO>> listadoGeneralEstudiantes(){
+
+        List<EstudianteDTO> listadoEdadEstudiante = estudianteService.findAll()
+                .stream()
+                .map(x -> mapper.toDTO(x)).toList();
+
+        return new ResponseEntity<>(listadoEdadEstudiante, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/listarEstudiantePorId/{idStudent}")
+    public ResponseEntity<EstudianteDTO> listado(@PathVariable("idStudent") Integer idStudent){
+
+        Estudiante student = estudianteService.findById(idStudent);
+
+        return new ResponseEntity<>(mapper.toDTO(student), HttpStatus.OK);
+    }
+
+    @GetMapping("/studentListByAscOrder")
+    public ResponseEntity<List<EstudianteDTO>> studentListByAscOrder(){
+
+        //El metodo findAllByOrderByEdadDesc() obtiene una lista ordenes de estudiantes por edad en orden descendente.
+        List<Estudiante> listByEdadAscOrder = estudianteService.findAllByOrderByEdadDesc();
+        List<EstudianteDTO> listaEstudianteDTO = listByEdadAscOrder.stream().map(x -> mapper.toDTO(x)).toList();
+
+        return new ResponseEntity<>(listaEstudianteDTO, HttpStatus.OK);
     }
 
     @PostMapping("/createRegistration")
-    public ResponseEntity<Estudiante> saveStudentRecord(@RequestBody Estudiante student){
-       Estudiante studentDetails = estudianteService.create(student);
-       return new ResponseEntity<>(studentDetails, HttpStatus.CREATED);
+    public ResponseEntity<EstudianteDTO> saveStudentRecord(@RequestBody EstudianteDTO studentDTO){
+        Estudiante studentDetails = estudianteService.create(mapper.toEntity(studentDTO));
+        return new ResponseEntity<>(mapper.toDTO(studentDetails), HttpStatus.CREATED);
     }
 
     @PutMapping("/updateStudentRecord/{idStudent}")
-    public ResponseEntity<Estudiante> updateStudentRecord(@RequestBody Estudiante student, @PathVariable("idStudent") Integer idStudent) throws Exception {
-       Estudiante studentUpdate =  estudianteService.update(student,idStudent);
-      return new ResponseEntity<>(studentUpdate, HttpStatus.OK);
+    public ResponseEntity<EstudianteDTO> updateStudentRecord(@RequestBody EstudianteDTO studentDTO, @PathVariable("idStudent") Integer idStudent) throws Exception {
+        Estudiante studentUpdate =  estudianteService.update(mapper.toEntity(studentDTO),idStudent);
+        return new ResponseEntity<>(mapper.toDTO(studentUpdate), HttpStatus.OK);
     }
 
     @DeleteMapping("/studentRecordDeletion/{idStudent}")
@@ -49,7 +69,5 @@ public class EstudianteController {
         estudianteService.delete(idStudent);
         return ResponseEntity.noContent().build();
     }
-
-
 
 }

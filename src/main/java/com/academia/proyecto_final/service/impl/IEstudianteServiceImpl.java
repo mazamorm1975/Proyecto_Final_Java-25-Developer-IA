@@ -7,6 +7,8 @@ import com.academia.proyecto_final.service.IEstudianteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class IEstudianteServiceImpl extends CRUDGenericImpl<Estudiante, Integer> implements IEstudianteService {
@@ -20,4 +22,8 @@ public class IEstudianteServiceImpl extends CRUDGenericImpl<Estudiante, Integer>
     }
 
 
+    @Override
+    public List<Estudiante> findAllByOrderByEdadDesc() {
+        return studentRepo.findAllByOrderByEdadDesc();
+    }
 }
