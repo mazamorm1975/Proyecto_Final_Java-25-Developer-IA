@@ -28,7 +28,7 @@ public class EstudianteController {
 
         List<EstudianteDTO> listadoEdadEstudiante = estudianteService.findAll()
                 .stream()
-                .map(x -> mapper.toDTO(x)).toList();
+                .map(mapper::toStudentDTO).toList();
 
         return new ResponseEntity<>(listadoEdadEstudiante, HttpStatus.OK);
     }
@@ -39,7 +39,7 @@ public class EstudianteController {
 
         Estudiante student = estudianteService.findById(idStudent);
 
-        return new ResponseEntity<>(mapper.toDTO(student), HttpStatus.OK);
+        return new ResponseEntity<>(mapper.toStudentDTO(student), HttpStatus.OK);
     }
 
     @GetMapping("/studentListByAscOrder")
@@ -47,21 +47,21 @@ public class EstudianteController {
 
         //El metodo findAllByOrderByEdadDesc() obtiene una lista ordenes de estudiantes por edad en orden descendente.
         List<Estudiante> listByEdadAscOrder = estudianteService.findAllByOrderByEdadDesc();
-        List<EstudianteDTO> listaEstudianteDTO = listByEdadAscOrder.stream().map(x -> mapper.toDTO(x)).toList();
+        List<EstudianteDTO> listaEstudianteDTO = listByEdadAscOrder.stream().map(x -> mapper.toStudentDTO(x)).toList();
 
         return new ResponseEntity<>(listaEstudianteDTO, HttpStatus.OK);
     }
 
     @PostMapping("/createRegistration")
     public ResponseEntity<EstudianteDTO> saveStudentRecord(@RequestBody EstudianteDTO studentDTO){
-        Estudiante studentDetails = estudianteService.create(mapper.toEntity(studentDTO));
-        return new ResponseEntity<>(mapper.toDTO(studentDetails), HttpStatus.CREATED);
+        Estudiante studentDetails = estudianteService.create(mapper.toStudentEntity(studentDTO));
+        return new ResponseEntity<>(mapper.toStudentDTO(studentDetails), HttpStatus.CREATED);
     }
 
     @PutMapping("/updateStudentRecord/{idStudent}")
     public ResponseEntity<EstudianteDTO> updateStudentRecord(@RequestBody EstudianteDTO studentDTO, @PathVariable("idStudent") Integer idStudent) throws Exception {
-        Estudiante studentUpdate =  estudianteService.update(mapper.toEntity(studentDTO),idStudent);
-        return new ResponseEntity<>(mapper.toDTO(studentUpdate), HttpStatus.OK);
+        Estudiante studentUpdate =  estudianteService.update(mapper.toStudentEntity(studentDTO),idStudent);
+        return new ResponseEntity<>(mapper.toStudentDTO(studentUpdate), HttpStatus.OK);
     }
 
     @DeleteMapping("/studentRecordDeletion/{idStudent}")
